@@ -1,0 +1,100 @@
+# Demo trọn gói LMS Analytics (SPEC 6.4): PostgreSQL + khởi tạo dữ liệu + ETL scheduler + API + Web.
+#
+#   Copy-Item docker/.env.example docker/.env        # điền BACKEND_JWT_SECRET, BACKEND_SEED_PASSWORD
+#   docker compose --env-file docker/.env up --build -d
+#   Mở http://localhost:8080  (lần đầu dịch vụ init mất vài phút để sinh dữ liệu)
+name: lms-analytics
+
+x-app-env: &app-env
+  APP_TIMEZONE: Asia/Ho_Chi_Minh
+  LMS_AS_OF: ${LMS_AS_OF-2026-11-06T10:30:00+07:00}
+  ANALYTICS_DB_HOST: db
+  ANALYTICS_DB_PORT: "5432"
+  ANALYTICS_DB_NAME: lms_analytics
+  ANALYTICS_DB_USER: lms
+  ANALYTICS_DB_PASSWORD: ${POSTGRES_PASSWORD:-lms_local_only}
+  ANALYTICS_DB_MAINTENANCE_DB: postgres
+  MOODLE_DB_HOST: db
+  MOODLE_DB_PORT: "5432"
+  MOODLE_DB_NAME: moodle_src
+  MOODLE_DB_USER: lms
+  MOODLE_DB_PASSWORD: ${POSTGRES_PASSWORD:-lms_local_only}
+  MOODLE_DB_MAINTENANCE_DB: postgres
+  BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET:?Đặt BACKEND_JWT_SECRET (>= 32 ký tự) trong docker/.env}
+  BACKEND_CORS_ORIGINS: http://localhost:${WEB_PORT:-8080}
+
+x-python-image: &python-image
+  build:
+    context: .
+    dockerfile: docker/python.Dockerfile
+  image: lms-analytics-python:latest
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: lms
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lms_local_only}
+      POSTGRES_DB: postgres
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lms -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  init:
+    <<: *python-image
+    command: ["sh", "docker/bootstrap.sh"]
+    environment:
+      <<: *app-env
+      BACKFILL_FROM: ${BACKFILL_FROM:-2026-09-07}
+      BACKEND_SEED_PASSWORD: ${BACKEND_SEED_PASSWORD:?Đặt BACKEND_SEED_PASSWORD (mật khẩu ban đầu, >= 8 ký tự) trong docker/.env}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    <<: *python-image
+    # timeout-keep-alive 65s: mặc định 5s gây tranh chấp đóng kết nối với client có think-time vài giây
+    # (đo được: vài request đơn lẻ chờ tới 30–69 giây; đặt 65s thì chậm nhất còn 0,55 giây)
+    command: ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000",
+              "--workers", "2", "--timeout-keep-alive", "65", "--proxy-headers", "--forwarded-allow-ips", "*"]
+    environment: *app-env
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  etl:
+    <<: *python-image
+    command: ["python", "-m", "etl.scheduler"]
+    environment: *app-env
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    image: lms-analytics-web:latest
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

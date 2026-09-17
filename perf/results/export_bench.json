@@ -1,0 +1,56 @@
+{
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "cpu_count": 12,
+    "measured_at": "2026-09-17T05:12:44"
+  },
+  "cases": [
+    {
+      "case": "pdf_risk_red_x1",
+      "dataset": "x1",
+      "rows": 408,
+      "runs": 3,
+      "seconds": [
+        0.641,
+        0.532,
+        0.528
+      ],
+      "median_seconds": 0.532,
+      "size_kb": 166,
+      "target_seconds": 5.0,
+      "passed": true
+    },
+    {
+      "case": "pdf_risk_all_x1",
+      "dataset": "x1",
+      "rows": 2383,
+      "runs": 3,
+      "seconds": [
+        2.826,
+        2.862,
+        2.858
+      ],
+      "median_seconds": 2.858,
+      "size_kb": 514,
+      "target_seconds": null,
+      "passed": null
+    },
+    {
+      "case": "excel_risk_all_x10",
+      "dataset": "x10",
+      "rows": 23830,
+      "runs": 3,
+      "seconds": [
+        4.089,
+        4.544,
+        4.481
+      ],
+      "median_seconds": 4.481,
+      "size_kb": 1573,
+      "target_seconds": 5.0,
+      "passed": true
+    }
+  ]
+}

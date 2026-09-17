@@ -1,0 +1,776 @@
+{
+  "dataset": "x10",
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "cpu_count": 12,
+    "measured_at": "2026-09-17T03:57:03"
+  },
+  "scale": {
+    "risk_rows": 1458460,
+    "progress_rows": 9150,
+    "courses": 150,
+    "size": "2588 MB"
+  },
+  "repeats": 5,
+  "big_tables": [
+    "fact_student_risk_summary"
+  ],
+  "criteria": {
+    "max_ms": 100,
+    "no_seq_scan_on_rows_over": 100000
+  },
+  "queries": [
+    {
+      "endpoint": "GET /admin/enrollment/by-faculty",
+      "sql": "WITH latest AS ( SELECT DISTINCT ON (course_id) * FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s AND academic_year = %(ay)s AND semester = %(sem)s ORDER BY course_id, stat_date DESC) SELECT faculty_id, faculty_name, COUNT(*) AS course_count, SUM(total_enrolled_students) AS enrolled, SUM(total_active_students) AS active, SUM(red_count) AS red_count, SUM(yellow_count) AS yell",
+      "median_ms": 8.55,
+      "max_ms": 9.02,
+      "shared_hit_blocks": 8307,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Incremental Sort",
+        "Index Scan",
+        "Sort",
+        "Subquery Scan",
+        "Unique"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/overview/kpis",
+      "sql": "WITH latest AS ( SELECT DISTINCT ON (course_id) * FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s AND academic_year = %(ay)s AND semester = %(sem)s ORDER BY course_id, stat_date DESC) SELECT COUNT(*) AS total_courses, COALESCE(SUM(total_enrolled_students), 0) AS total_enrolled, COALESCE(SUM(total_active_students), 0) AS total_active, COALESCE(SUM(red_count), 0) AS red_studen",
+      "median_ms": 8.13,
+      "max_ms": 8.7,
+      "shared_hit_blocks": 8307,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Incremental Sort",
+        "Index Scan",
+        "Unique"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/reports/preview (risk, RED)",
+      "sql": "SELECT * FROM ( WITH courses AS ( SELECT DISTINCT course_id FROM analytics.fact_course_progress_daily WHERE stat_date <= %(snapshot)s AND academic_year = %(ay)s AND semester = %(sem)s ), snap AS ( SELECT c.course_id, (SELECT MAX(x.snapshot_date) FROM analytics.fact_student_risk_summary x WHERE x.course_id = c.course_id AND x.snapshot_date <= %(snapshot)s) AS snapshot_date FROM courses c ) SELECT f",
+      "median_ms": 8.05,
+      "max_ms": 9.23,
+      "shared_hit_blocks": 5594,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Index Only Scan",
+        "Index Scan",
+        "Limit",
+        "Nested Loop",
+        "Result",
+        "Seq Scan",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level",
+        "ix_risk_red_partial"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/reports/preview (risk, RED)",
+      "sql": "SELECT COUNT(*) FROM ( WITH courses AS ( SELECT DISTINCT course_id FROM analytics.fact_course_progress_daily WHERE stat_date <= %(snapshot)s AND academic_year = %(ay)s AND semester = %(sem)s ), snap AS ( SELECT c.course_id, (SELECT MAX(x.snapshot_date) FROM analytics.fact_student_risk_summary x WHERE x.course_id = c.course_id AND x.snapshot_date <= %(snapshot)s) AS snapshot_date FROM courses c ) S",
+      "median_ms": 4.52,
+      "max_ms": 4.99,
+      "shared_hit_blocks": 1532,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Index Only Scan",
+        "Limit",
+        "Nested Loop",
+        "Result",
+        "Seq Scan"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level",
+        "ix_risk_red_partial"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students",
+      "sql": "SELECT user_id, student_code, student_name, email, risk_level, risk_score, risk_reasons, score_attendance, score_inactivity, score_assignment, total_sessions, attended_sessions, absent_sessions, absence_rate, attendance_status, total_assignments, submitted_assignments, missing_assignments_count, late_submissions, completion_rate, total_access_count, access_count_7d, access_count_14d, last_access_t",
+      "median_ms": 3.19,
+      "max_ms": 3.33,
+      "shared_hit_blocks": 216,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level",
+        "ix_risk_teacher_gin"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}/compare",
+      "sql": "WITH cls AS ( SELECT ROUND(AVG(access_count_14d), 2) AS access_14d, ROUND(AVG(total_access_count), 2) AS total_access FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date = %(snapshot_date)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)] ), progress AS ( SELECT assignment_submission_rate, attendance_rate, avg_completion_rate FROM analytics.fact_cour",
+      "median_ms": 3.07,
+      "max_ms": 3.19,
+      "shared_hit_blocks": 265,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd",
+        "Index Scan",
+        "Limit",
+        "Nested Loop",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_teacher_gin",
+        "ix_risk_course_date_level",
+        "ix_risk_teacher_gin",
+        "pk_fact_course_progress_daily",
+        "pk_fact_student_risk_summary"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/risk-summary",
+      "sql": "SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE risk_level = 'RED') AS red, COUNT(*) FILTER (WHERE risk_level = 'YELLOW') AS yellow, COUNT(*) FILTER (WHERE risk_level = 'GREEN') AS green, COUNT(*) FILTER (WHERE score_attendance > 0) AS attendance, COUNT(*) FILTER (WHERE score_inactivity > 0) AS inactivity, COUNT(*) FILTER (WHERE score_assignment > 0) AS assignment, COUNT(*) FILTER (WHERE score_at",
+      "median_ms": 2.89,
+      "max_ms": 3.29,
+      "shared_hit_blocks": 216,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level",
+        "ix_risk_teacher_gin"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students",
+      "sql": "SELECT COUNT(*) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date = %(snapshot_date)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 2.81,
+      "max_ms": 3.25,
+      "shared_hit_blocks": 216,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level",
+        "ix_risk_teacher_gin"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/overview/kpis",
+      "sql": "SELECT academic_year, semester FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s ORDER BY stat_date DESC, academic_year DESC, semester DESC LIMIT 1",
+      "median_ms": 1.39,
+      "max_ms": 1.46,
+      "shared_hit_blocks": 13,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Only Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_term_faculty"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/faculties/{id}/courses",
+      "sql": "SELECT academic_year, semester FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s ORDER BY stat_date DESC, academic_year DESC, semester DESC LIMIT 1",
+      "median_ms": 1.35,
+      "max_ms": 1.37,
+      "shared_hit_blocks": 13,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Only Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_term_faculty"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/by-faculty",
+      "sql": "SELECT academic_year, semester FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s ORDER BY stat_date DESC, academic_year DESC, semester DESC LIMIT 1",
+      "median_ms": 1.31,
+      "max_ms": 1.39,
+      "shared_hit_blocks": 13,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Only Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_term_faculty"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/reports/preview (risk, RED)",
+      "sql": "SELECT academic_year, semester FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s ORDER BY stat_date DESC, academic_year DESC, semester DESC LIMIT 1",
+      "median_ms": 1.31,
+      "max_ms": 1.39,
+      "shared_hit_blocks": 13,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Only Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_term_faculty"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/faculties/{id}/courses",
+      "sql": "WITH latest AS ( SELECT DISTINCT ON (course_id) * FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s AND academic_year = %(ay)s AND semester = %(sem)s AND faculty_id = %(faculty_id)s ORDER BY course_id, stat_date DESC) SELECT course_id, course_shortname AS shortname, course_fullname AS fullname, category_id, category_name, stat_date, total_enrolled_students AS enrolled, total_a",
+      "median_ms": 0.94,
+      "max_ms": 0.96,
+      "shared_hit_blocks": 76,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Sort",
+        "Subquery Scan",
+        "Unique"
+      ],
+      "indexes": [
+        "ix_cpd_term_faculty"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/courses/{id}/students",
+      "sql": "SELECT user_id, student_code, student_name, email, EXISTS (SELECT 1 FROM jsonb_array_elements(weekly_activity) w WHERE (w->>'views')::int + (w->>'actions')::int > 0) AS is_active, total_access_count, access_count_7d, last_access_time, days_since_last_access, risk_level, risk_score FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date = %(snapshot_date)s AND NOT",
+      "median_ms": 0.65,
+      "max_ms": 0.68,
+      "shared_hit_blocks": 206,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Function Scan",
+        "Limit",
+        "Result",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/courses/{id}/students",
+      "sql": "SELECT COUNT(*) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date = %(snapshot_date)s AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(weekly_activity) w WHERE (w->>'views')::int + (w->>'actions')::int > 0)",
+      "median_ms": 0.57,
+      "max_ms": 0.6,
+      "shared_hit_blocks": 206,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Function Scan"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/traffic/heatmap",
+      "sql": "SELECT day_of_week, hour_of_day, ROUND(AVG(total_requests), 1) AS avg_requests, ROUND(AVG(avg_online_users), 1) AS avg_online_users, ROUND(100.0 * AVG(is_peak_hour::int), 1) AS peak_share, COUNT(*) AS days FROM analytics.fact_server_traffic_hourly WHERE stat_date >= %(from_date)s AND stat_date < %(today)s GROUP BY day_of_week, hour_of_day ORDER BY day_of_week, hour_of_day",
+      "median_ms": 0.51,
+      "max_ms": 0.52,
+      "shared_hit_blocks": 18,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Seq Scan",
+        "Sort"
+      ],
+      "indexes": [],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students?risk_level=RED&search",
+      "sql": "SELECT user_id, student_code, student_name, email, risk_level, risk_score, risk_reasons, score_attendance, score_inactivity, score_assignment, total_sessions, attended_sessions, absent_sessions, absence_rate, attendance_status, total_assignments, submitted_assignments, missing_assignments_count, late_submissions, completion_rate, total_access_count, access_count_7d, access_count_14d, last_access_t",
+      "median_ms": 0.43,
+      "max_ms": 0.57,
+      "shared_hit_blocks": 41,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_risk_red_partial"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students?risk_level=RED&search",
+      "sql": "SELECT COUNT(*) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date = %(snapshot_date)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)] AND risk_level = ANY(CAST(%(levels)s AS text[])) AND (student_code ILIKE %(q)s OR student_name ILIKE %(q)s OR email ILIKE %(q)s)",
+      "median_ms": 0.4,
+      "max_ms": 0.44,
+      "shared_hit_blocks": 41,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Index Scan"
+      ],
+      "indexes": [
+        "ix_risk_red_partial"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/progress?granularity=week",
+      "sql": "SELECT DISTINCT ON (date_trunc('week', stat_date)) date_trunc('week', stat_date)::date AS period_start, stat_date AS period_end, to_char(stat_date, 'IYYY-\"W\"IW') AS period, total_enrolled_students AS enrolled, MAX(active_students_day) OVER w AS active_students_day, active_students_7d, total_active_students, SUM(total_views_day) OVER w AS total_views_day, SUM(total_actions_day) OVER w AS total_acti",
+      "median_ms": 0.28,
+      "max_ms": 0.29,
+      "shared_hit_blocks": 45,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd",
+        "Incremental Sort",
+        "Sort",
+        "Unique",
+        "WindowAgg"
+      ],
+      "indexes": [
+        "ix_cpd_teacher_gin",
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses",
+      "sql": "WITH latest AS ( SELECT DISTINCT ON (course_id) * FROM analytics.fact_course_progress_daily WHERE stat_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)] ORDER BY course_id, stat_date DESC) SELECT course_id, course_shortname AS shortname, course_fullname AS fullname, faculty_name, category_name, academic_year, semester, stat_date, total_enrolled_students AS enrolled, total",
+      "median_ms": 0.24,
+      "max_ms": 0.37,
+      "shared_hit_blocks": 51,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Sort",
+        "Subquery Scan",
+        "Unique"
+      ],
+      "indexes": [
+        "ix_cpd_teacher_gin"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 0.16,
+      "max_ms": 0.22,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/traffic/hourly (7 ngày)",
+      "sql": "SELECT stat_hour, stat_date, hour_of_day, day_of_week, total_requests, unique_users, login_count, failed_login_count, ws_requests, peak_online_users, avg_online_users, online_sample_count, is_peak_hour FROM analytics.fact_server_traffic_hourly WHERE stat_hour >= %(start)s AND stat_hour < %(end)s ORDER BY stat_hour",
+      "median_ms": 0.15,
+      "max_ms": 0.16,
+      "shared_hit_blocks": 6,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Sort"
+      ],
+      "indexes": [
+        "pk_fact_server_traffic_hourly"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/progress?granularity=week",
+      "sql": "SELECT stat_date, total_enrolled_students AS enrolled, active_students_day, active_students_7d, total_active_students, total_views_day, total_actions_day, submissions_day, total_assignments, avg_completion_rate, assignment_submission_rate, attendance_rate, avg_access_per_student, red_count, yellow_count, green_count, section_progress FROM analytics.fact_course_progress_daily WHERE course_id = %(co",
+      "median_ms": 0.15,
+      "max_ms": 0.17,
+      "shared_hit_blocks": 45,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "BitmapAnd",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "ix_cpd_teacher_gin",
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students?risk_level=RED&search",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 0.14,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 0.14,
+      "max_ms": 0.14,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/risk-summary",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 0.13,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}",
+      "sql": "SELECT snapshot_date AS date, risk_level, risk_score, score_attendance, score_inactivity, score_assignment FROM analytics.fact_student_risk_summary WHERE user_id = %(user_id)s AND course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)] ORDER BY snapshot_date",
+      "median_ms": 0.13,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 64,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan"
+      ],
+      "indexes": [
+        "pk_fact_student_risk_summary"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}/compare",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s AND teacher_ids @> ARRAY[CAST(%(teacher_id)s AS integer)]",
+      "median_ms": 0.11,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/courses/{id}/students",
+      "sql": "SELECT MAX(snapshot_date) FROM analytics.fact_student_risk_summary WHERE course_id = %(course_id)s AND snapshot_date <= %(today)s",
+      "median_ms": 0.1,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Only Scan",
+        "Limit",
+        "Result"
+      ],
+      "indexes": [
+        "ix_risk_course_date_level"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}",
+      "sql": "SELECT snapshot_date, course_id, course_shortname, course_fullname, faculty_name, academic_year, semester, user_id, student_code, student_name, email, risk_level, risk_score, risk_reasons, score_attendance, score_inactivity, score_assignment, total_sessions, attended_sessions, absent_sessions, absence_rate, attendance_status, total_assignments, submitted_assignments, missing_assignments_count, lat",
+      "median_ms": 0.1,
+      "max_ms": 0.1,
+      "shared_hit_blocks": 4,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan"
+      ],
+      "indexes": [
+        "pk_fact_student_risk_summary"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/enrollment/courses/{id}/students",
+      "sql": "SELECT course_id, course_shortname AS shortname, course_fullname AS fullname, faculty_id, faculty_name, category_id, category_name, academic_year, semester, teacher_ids, stat_date, total_enrolled_students AS enrolled, total_active_students AS active FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.09,
+      "max_ms": 0.13,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/overview/kpis",
+      "sql": "SELECT stat_hour, total_requests FROM analytics.fact_server_traffic_hourly WHERE stat_hour >= %(day_start)s AND stat_hour <= %(current_hour)s ORDER BY total_requests DESC, stat_hour LIMIT 1",
+      "median_ms": 0.08,
+      "max_ms": 0.13,
+      "shared_hit_blocks": 5,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexes": [
+        "pk_fact_server_traffic_hourly"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/overview/kpis",
+      "sql": "SELECT ROUND(AVG(online_users), 1) FROM analytics.etl_online_snapshot WHERE slot_start >= %(day_start)s AND slot_start <= %(now)s",
+      "median_ms": 0.08,
+      "max_ms": 0.09,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Aggregate",
+        "Index Scan"
+      ],
+      "indexes": [
+        "pk_etl_online_snapshot"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.07,
+      "max_ms": 0.1,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students?risk_level=RED&search",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.07,
+      "max_ms": 0.1,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.07,
+      "max_ms": 0.15,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/students/{uid}/compare",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.07,
+      "max_ms": 0.08,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/progress?granularity=week",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.07,
+      "max_ms": 0.1,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /admin/overview/kpis",
+      "sql": "SELECT slot_start, online_users FROM analytics.etl_online_snapshot WHERE slot_start <= %(now)s ORDER BY slot_start DESC LIMIT 1",
+      "median_ms": 0.06,
+      "max_ms": 0.06,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_etl_online_snapshot"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    },
+    {
+      "endpoint": "GET /teacher/courses/{id}/risk-summary",
+      "sql": "SELECT teacher_ids FROM analytics.fact_course_progress_daily WHERE course_id = %(course_id)s AND stat_date <= %(today)s ORDER BY stat_date DESC LIMIT 1",
+      "median_ms": 0.06,
+      "max_ms": 0.07,
+      "shared_hit_blocks": 3,
+      "shared_read_blocks": 0,
+      "node_types": [
+        "Index Scan",
+        "Limit"
+      ],
+      "indexes": [
+        "pk_fact_course_progress_daily"
+      ],
+      "seq_scan_on_big_tables": [],
+      "passed": true
+    }
+  ]
+}

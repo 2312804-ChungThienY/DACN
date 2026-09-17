@@ -1,0 +1,287 @@
+{
+  "base": "http://127.0.0.1:4174",
+  "targets": {
+    "firstChartMs": 1000,
+    "lcpMs": 2500,
+    "ttiApproxMs": 3000
+  },
+  "measuredAt": "2026-09-16T22:19:23.905Z",
+  "results": [
+    {
+      "page": "admin_overview",
+      "profile": "binh_thuong",
+      "cpuThrottle": 1,
+      "runs": 5,
+      "median": {
+        "ttfbMs": 4.3,
+        "domContentLoadedMs": 91.7,
+        "loadMs": 91.9,
+        "firstChartMs": 334.8,
+        "lcpMs": 360,
+        "ttiApproxMs": 389.4,
+        "tbtMs": 27,
+        "transferKB": 526.9
+      },
+      "passed": true,
+      "raw": [
+        {
+          "ttfbMs": 3.5999999940395355,
+          "domContentLoadedMs": 91.59999999403954,
+          "loadMs": 91.70000000298023,
+          "firstChartMs": 456.5,
+          "lcpMs": 664,
+          "ttiApproxMs": 514.2999999970198,
+          "tbtMs": 126,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 3.3999999910593033,
+          "domContentLoadedMs": 74.3999999910593,
+          "loadMs": 74.59999999403954,
+          "firstChartMs": 276.8999999910593,
+          "lcpMs": 300,
+          "ttiApproxMs": 132,
+          "tbtMs": 7,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 6,
+          "domContentLoadedMs": 104.09999999403954,
+          "loadMs": 104.20000000298023,
+          "firstChartMs": 334.79999999701977,
+          "lcpMs": 360,
+          "ttiApproxMs": 389.40000000596046,
+          "tbtMs": 27,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 4.5,
+          "domContentLoadedMs": 95.79999999701977,
+          "loadMs": 95.79999999701977,
+          "firstChartMs": 396.69999998807907,
+          "lcpMs": 424,
+          "ttiApproxMs": 479.3999999910593,
+          "tbtMs": 52,
+          "transferKB": 570.271484375
+        },
+        {
+          "ttfbMs": 4.299999997019768,
+          "domContentLoadedMs": 91.70000000298023,
+          "loadMs": 91.8999999910593,
+          "firstChartMs": 308.20000000298023,
+          "lcpMs": 332,
+          "ttiApproxMs": 309.29999999701977,
+          "tbtMs": 21,
+          "transferKB": 526.8857421875
+        }
+      ]
+    },
+    {
+      "page": "admin_overview",
+      "profile": "cpu_cham_4x",
+      "cpuThrottle": 4,
+      "runs": 5,
+      "median": {
+        "ttfbMs": 4.2,
+        "domContentLoadedMs": 219.4,
+        "loadMs": 219.8,
+        "firstChartMs": 1414,
+        "lcpMs": 1456,
+        "ttiApproxMs": 2154.1,
+        "tbtMs": 1120,
+        "transferKB": 526.9
+      },
+      "passed": false,
+      "raw": [
+        {
+          "ttfbMs": 4.200000002980232,
+          "domContentLoadedMs": 236.29999999701977,
+          "loadMs": 236.79999999701977,
+          "firstChartMs": 1420,
+          "lcpMs": 1464,
+          "ttiApproxMs": 2154.0999999940395,
+          "tbtMs": 1045,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 3.9000000059604645,
+          "domContentLoadedMs": 212.6000000089407,
+          "loadMs": 213.40000000596046,
+          "firstChartMs": 1460.2000000029802,
+          "lcpMs": 1504,
+          "ttiApproxMs": 2237.9000000059605,
+          "tbtMs": 1140,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 4.5999999940395355,
+          "domContentLoadedMs": 200.29999999701977,
+          "loadMs": 200.59999999403954,
+          "firstChartMs": 1404.7999999970198,
+          "lcpMs": 1456,
+          "ttiApproxMs": 2176.5999999940395,
+          "tbtMs": 1123,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 4.200000002980232,
+          "domContentLoadedMs": 223.09999999403954,
+          "loadMs": 223.29999999701977,
+          "firstChartMs": 1352.2000000029802,
+          "lcpMs": 1400,
+          "ttiApproxMs": 2115.0999999940395,
+          "tbtMs": 1085,
+          "transferKB": 526.8857421875
+        },
+        {
+          "ttfbMs": 4.899999991059303,
+          "domContentLoadedMs": 219.3999999910593,
+          "loadMs": 219.79999999701977,
+          "firstChartMs": 1414,
+          "lcpMs": 1456,
+          "ttiApproxMs": 2099.199999988079,
+          "tbtMs": 1120,
+          "transferKB": 526.8857421875
+        }
+      ]
+    },
+    {
+      "page": "teacher_risk",
+      "profile": "binh_thuong",
+      "cpuThrottle": 1,
+      "runs": 5,
+      "median": {
+        "ttfbMs": 4.2,
+        "domContentLoadedMs": 80.4,
+        "loadMs": 80.5,
+        "firstChartMs": 408.8,
+        "lcpMs": 428,
+        "ttiApproxMs": 460.5,
+        "tbtMs": 63,
+        "transferKB": 500
+      },
+      "passed": true,
+      "raw": [
+        {
+          "ttfbMs": 3.5999999940395355,
+          "domContentLoadedMs": 80,
+          "loadMs": 80.09999999403954,
+          "firstChartMs": 364.20000000298023,
+          "lcpMs": 384,
+          "ttiApproxMs": 439.59999999403954,
+          "tbtMs": 63,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 3.8999999910593033,
+          "domContentLoadedMs": 80.3999999910593,
+          "loadMs": 80.5,
+          "firstChartMs": 460.70000000298023,
+          "lcpMs": 484,
+          "ttiApproxMs": 460.5,
+          "tbtMs": 57,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 4.300000011920929,
+          "domContentLoadedMs": 79.1000000089407,
+          "loadMs": 79.20000000298023,
+          "firstChartMs": 489.70000000298023,
+          "lcpMs": 512,
+          "ttiApproxMs": 489.20000000298023,
+          "tbtMs": 66,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 5.5999999940395355,
+          "domContentLoadedMs": 86.79999999701977,
+          "loadMs": 86.79999999701977,
+          "firstChartMs": 408.79999999701977,
+          "lcpMs": 428,
+          "ttiApproxMs": 480.5,
+          "tbtMs": 76,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 4.200000002980232,
+          "domContentLoadedMs": 82.5,
+          "loadMs": 82.59999999403954,
+          "firstChartMs": 351.5,
+          "lcpMs": 368,
+          "ttiApproxMs": 425,
+          "tbtMs": 58,
+          "transferKB": 499.9814453125
+        }
+      ]
+    },
+    {
+      "page": "teacher_risk",
+      "profile": "cpu_cham_4x",
+      "cpuThrottle": 4,
+      "runs": 5,
+      "median": {
+        "ttfbMs": 4,
+        "domContentLoadedMs": 216.1,
+        "loadMs": 216.8,
+        "firstChartMs": 2075.1,
+        "lcpMs": 2140,
+        "ttiApproxMs": 2187,
+        "tbtMs": 1359,
+        "transferKB": 500
+      },
+      "passed": false,
+      "raw": [
+        {
+          "ttfbMs": 3.7999999970197678,
+          "domContentLoadedMs": 220.70000000298023,
+          "loadMs": 220.8999999910593,
+          "firstChartMs": 2075.0999999940395,
+          "lcpMs": 2140,
+          "ttiApproxMs": 2187,
+          "tbtMs": 1324,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 4.5,
+          "domContentLoadedMs": 216.1000000089407,
+          "loadMs": 216.80000001192093,
+          "firstChartMs": 2132,
+          "lcpMs": 2196,
+          "ttiApproxMs": 2246.5,
+          "tbtMs": 1402,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 4,
+          "domContentLoadedMs": 235.5,
+          "loadMs": 236.09999999403954,
+          "firstChartMs": 2440.5999999940395,
+          "lcpMs": 2500,
+          "ttiApproxMs": 2553,
+          "tbtMs": 1668,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 4.5,
+          "domContentLoadedMs": 204.5,
+          "loadMs": 205.09999999403954,
+          "firstChartMs": 2011.8999999910593,
+          "lcpMs": 2064,
+          "ttiApproxMs": 2136.0999999940395,
+          "tbtMs": 1359,
+          "transferKB": 499.9814453125
+        },
+        {
+          "ttfbMs": 3.4000000059604645,
+          "domContentLoadedMs": 192.1000000089407,
+          "loadMs": 192.80000001192093,
+          "firstChartMs": 1989.5,
+          "lcpMs": 2044,
+          "ttiApproxMs": 2113.800000011921,
+          "tbtMs": 1317,
+          "transferKB": 499.9814453125
+        }
+      ]
+    }
+  ]
+}

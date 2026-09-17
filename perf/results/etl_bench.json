@@ -1,0 +1,184 @@
+{
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "cpu_count": 12,
+    "measured_at": "2026-09-17T03:55:01"
+  },
+  "as_of": "2026-11-06T10:30:00+07:00",
+  "source": {
+    "students": 2000,
+    "active_enrolments": 9677,
+    "courses": 15,
+    "logstore_rows": 4974543,
+    "database_size": "2001 MB"
+  },
+  "note": "job_seconds lấy từ etl_run_log (không gồm thời gian khởi động Python)",
+  "jobs": [
+    {
+      "job": "traffic",
+      "schedule": "mỗi 5 phút",
+      "target_seconds": 30,
+      "runs": 3,
+      "job_seconds": [
+        0.269897,
+        0.097546,
+        0.097354
+      ],
+      "job_median_seconds": 0.097546,
+      "process_seconds": [
+        3.909117499992135,
+        1.1004067000030773,
+        1.0678056000033394
+      ],
+      "rows": [
+        {
+          "run_id": 6,
+          "status": "SUCCESS",
+          "seconds": 0.269897,
+          "rows_extracted": 0,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 7,
+          "status": "SUCCESS",
+          "seconds": 0.097546,
+          "rows_extracted": 0,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 8,
+          "status": "SUCCESS",
+          "seconds": 0.097354,
+          "rows_extracted": 0,
+          "rows_loaded": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "job": "student_risk",
+      "schedule": "2 giờ/lần",
+      "target_seconds": 300,
+      "runs": 3,
+      "job_seconds": [
+        67.178605,
+        60.048389,
+        53.985722
+      ],
+      "job_median_seconds": 60.048389,
+      "process_seconds": [
+        68.17766810000467,
+        61.085542700006044,
+        55.073598700008006
+      ],
+      "rows": [
+        {
+          "run_id": 9,
+          "status": "SUCCESS",
+          "seconds": 67.178605,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 10,
+          "status": "SUCCESS",
+          "seconds": 60.048389,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 11,
+          "status": "SUCCESS",
+          "seconds": 53.985722,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "job": "course_progress",
+      "schedule": "mỗi giờ",
+      "target_seconds": null,
+      "runs": 3,
+      "job_seconds": [
+        65.477771,
+        62.761274,
+        60.378276
+      ],
+      "job_median_seconds": 62.761274,
+      "process_seconds": [
+        67.29614739998942,
+        64.13345170000684,
+        61.934261999995215
+      ],
+      "rows": [
+        {
+          "run_id": 12,
+          "status": "SUCCESS",
+          "seconds": 65.477771,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 13,
+          "status": "SUCCESS",
+          "seconds": 62.761274,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 14,
+          "status": "SUCCESS",
+          "seconds": 60.378276,
+          "rows_extracted": 343589,
+          "rows_loaded": 0
+        }
+      ],
+      "passed": null
+    },
+    {
+      "job": "nightly",
+      "schedule": "01:00 hằng đêm",
+      "target_seconds": 1200,
+      "runs": 3,
+      "job_seconds": [
+        61.972468,
+        60.121923,
+        60.067479
+      ],
+      "job_median_seconds": 60.121923,
+      "process_seconds": [
+        63.39253749999625,
+        61.36972220000462,
+        61.18919659999665
+      ],
+      "rows": [
+        {
+          "run_id": 15,
+          "status": "SUCCESS",
+          "seconds": 61.972468,
+          "rows_extracted": 761313,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 16,
+          "status": "SUCCESS",
+          "seconds": 60.121923,
+          "rows_extracted": 761313,
+          "rows_loaded": 0
+        },
+        {
+          "run_id": 17,
+          "status": "SUCCESS",
+          "seconds": 60.067479,
+          "rows_extracted": 761313,
+          "rows_loaded": 0
+        }
+      ],
+      "passed": true
+    }
+  ]
+}
