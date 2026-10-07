@@ -236,7 +236,7 @@ BACKEND_SEED_PASSWORD=Lms@2026demo
 Rồi chạy:
 ```powershell
 docker compose --env-file docker/.env up --build -d
-docker compose --env-file docker/.env logs -f init    # chờ dòng "[init] Hoàn tất." (~5–8 phút)
+     # chờ dòng "[init] Hoàn tất." (~5–8 phút)
 ```
 
 Mở **`http://localhost:8080`**.
